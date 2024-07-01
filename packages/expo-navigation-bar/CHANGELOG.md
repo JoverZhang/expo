@@ -10,6 +10,42 @@
 
 ### 💡 Others
 
+- Removed redundant usage of `EventEmitter` instance. ([#28946](https://github.com/expo/expo/pull/28946) by [@tsapeta](https://github.com/tsapeta))
+
+## 3.0.6 - 2024-06-06
+
+_This version does not introduce any user-facing changes._
+
+## 3.0.5 - 2024-06-05
+
+### 💡 Others
+
+- Pin @react-native subpackage versions to 0.74.83. ([#29441](https://github.com/expo/expo/pull/29441) by [@kudo](https://github.com/kudo))
+
+## 3.0.4 — 2024-05-02
+
+_This version does not introduce any user-facing changes._
+
+## 3.0.3 — 2024-05-01
+
+_This version does not introduce any user-facing changes._
+
+## 3.0.2 — 2024-04-23
+
+_This version does not introduce any user-facing changes._
+
+## 3.0.1 — 2024-04-22
+
+_This version does not introduce any user-facing changes._
+
+## 3.0.0 — 2024-04-18
+
+### 🐛 Bug fixes
+
+- Fix event listeners on Android. ([#28260](https://github.com/expo/expo/pull/28260) by [@gabrieldonadel](https://github.com/gabrieldonadel))
+
+### 💡 Others
+
 - Migrated dependency from `@react-native/normalize-color` to `@react-native/normalize-colors`. ([#27736](https://github.com/expo/expo/pull/27736) by [@kudo](https://github.com/kudo))
 - Removed deprecated backward compatible Gradle settings. ([#28083](https://github.com/expo/expo/pull/28083) by [@kudo](https://github.com/kudo))
 

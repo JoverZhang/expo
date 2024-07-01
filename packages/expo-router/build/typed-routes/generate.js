@@ -17,6 +17,7 @@ function getTypedRoutesDeclarationFile(ctx) {
     const dynamicRoutes = new Set();
     const dynamicRouteContextKeys = new Set();
     walkRouteNode((0, getRoutes_1.getRoutes)(ctx, {
+        platformRoutes: false,
         ignoreEntryPoints: true,
         ignoreRequireErrors: true,
         importMode: 'async',
@@ -74,7 +75,12 @@ function addRouteNode(routeNode, staticRoutes, dynamicRoutes, dynamicRouteContex
  * Converts a Set to a TypeScript union type
  */
 const setToUnionType = (set) => {
-    return set.size > 0 ? [...set].map((s) => `\`${s}\``).join(' | ') : 'never';
+    return set.size > 0
+        ? [...set]
+            .sort()
+            .map((s) => `\`${s}\``)
+            .join(' | ')
+        : 'never';
 };
 function generateCombinations(pathname) {
     const groups = pathname.split('/').filter((part) => part.startsWith('(') && part.endsWith(')'));

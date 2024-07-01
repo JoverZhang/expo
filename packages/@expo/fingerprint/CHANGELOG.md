@@ -6,6 +6,51 @@
 
 ### 🎉 New features
 
+### 🐛 Bug fixes
+
+### 💡 Others
+
+- Upgrade `glob@7` to `glob@10`. ([#29927](https://github.com/expo/expo/pull/29927) by [@byCedric](https://github.com/byCedric))
+
+## 0.10.0 - 2024-06-20
+
+### 🛠 Breaking changes
+
+- `diffFingerprints()` and `diffFingerprintChangesAsync()` have new output structure. ([#29709](https://github.com/expo/expo/pull/29709) by [@kudo](https://github.com/kudo))
+- This version includes fingerprint result breaking changes because `SourceSkips.PackageJsonAndroidAndIosScriptsIfNotContainRun` is enabled by default. ([#29679](https://github.com/expo/expo/pull/29679) by [@kudo](https://github.com/kudo))
+
+### 🐛 Bug fixes
+
+- Fixed `diffFingerprints()` missing some items when the second fingerprint has fewer items than the first fingerprint. ([#29709](https://github.com/expo/expo/pull/29709) by [@kudo](https://github.com/kudo))
+- Fixed Expo config sourcer using incorrect `cwd` by ([#29810](https://github.com/expo/expo/pull/29810) by [@a-gierczak](https://github.com/a-gierczak))
+- Introduced `enableReactImportsPatcher` to fix inconsistent fingerprint hash between workflows. ([#29660](https://github.com/expo/expo/pull/29660) by [@kudo](https://github.com/kudo))
+- Introduced `SourceSkips.PackageJsonAndroidAndIosScriptsIfNotContainRun` to fix inconsistent fingerprint for expo-updates. ([#29679](https://github.com/expo/expo/pull/29679) by [@kudo](https://github.com/kudo))
+
+## 0.9.0 — 2024-06-05
+
+### 🛠 Breaking changes
+
+- Include `runtimeVersion` back to fingerprint. Use `SourceSkips.ExpoConfigRuntimeVersionIfString` to keep original behavior.  ([#28712](https://github.com/expo/expo/pull/28712) by [@kudo](https://github.com/kudo))
+
+## 0.8.0 — 2024-05-15
+
+### 🎉 New features
+
+- Added `fingerprint.config.js` support for a project to customize some options. ([#28860](https://github.com/expo/expo/pull/28860) by [@kudo](https://github.com/kudo))
+- Added `sourceSkips` support to skip specific sourcers from fingerprint. ([#28712](https://github.com/expo/expo/pull/28712) by [@kudo](https://github.com/kudo))
+
+### 🐛 Bug fixes
+
+- Fixed missing community CLI autolinking source when it returns null values. ([#28835](https://github.com/expo/expo/pull/28835) by [@kudo](https://github.com/kudo))
+
+## 0.7.1 — 2024-04-23
+
+_This version does not introduce any user-facing changes._
+
+## 0.7.0 — 2024-04-18
+
+### 🎉 New features
+
 - Add silent option. ([#27325](https://github.com/expo/expo/pull/27325) by [@wschurman](https://github.com/wschurman))
 - Add debug option to enable verbose debug output. ([#27457](https://github.com/expo/expo/pull/27457) by [@wschurman](https://github.com/wschurman))
 - Added sourcer for `patch-project` patches support. ([#27653](https://github.com/expo/expo/pull/27653) by [@kudo](https://github.com/kudo))

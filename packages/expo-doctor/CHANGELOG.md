@@ -8,9 +8,33 @@
 
 ### 🐛 Bug fixes
 
-- Skip Cocoapods version check when not on macOS ([#27751](https://github.com/expo/expo/pull/27751) by [@keith-kurak](https://github.com/keith-kurak))
-
 ### 💡 Others
+
+## 1.6.1 — 2024-05-16
+
+_This version does not introduce any user-facing changes._
+
+## 1.6.0 — 2024-05-01
+
+### 🎉 New features
+
+- Check if local modules native code is unintentionally gitignored ([#28484](https://github.com/expo/expo/pull/28484) by [@keith-kurak](https://github.com/keith-kurak))
+
+### 🐛 Bug fixes
+
+- Fix failed deep dependency checks when using npm@~10.6+ ([#28563](https://github.com/expo/expo/pull/28563) by [@keith-kurak](https://github.com/keith-kurak))
+
+## 1.5.2 — 2024-04-24
+
+### 🐛 Bug fixes
+
+- Fix error when fetching schema for unpublished SDK versions ([#28204](https://github.com/expo/expo/pull/28204) by [@leonhh](https://github.com/leonhh))
+
+## 1.5.1 — 2024-04-18
+
+### 🐛 Bug fixes
+
+- Skip Cocoapods version check when not on macOS ([#27751](https://github.com/expo/expo/pull/27751) by [@keith-kurak](https://github.com/keith-kurak))
 
 ## 1.5.0 — 2024-03-06
 

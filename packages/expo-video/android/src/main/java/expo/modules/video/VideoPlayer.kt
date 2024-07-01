@@ -24,16 +24,18 @@ import expo.modules.kotlin.sharedobjects.SharedObject
 import expo.modules.video.enums.PlayerStatus
 import expo.modules.video.enums.PlayerStatus.*
 import expo.modules.video.records.PlaybackError
+import expo.modules.video.records.VideoSource
 import expo.modules.video.records.VolumeEvent
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 
 // https://developer.android.com/guide/topics/media/media3/getting-started/migration-guide#improvements_in_media3
 @UnstableApi
-class VideoPlayer(context: Context, appContext: AppContext, private val mediaItem: MediaItem) : AutoCloseable, SharedObject(appContext) {
+class VideoPlayer(val context: Context, appContext: AppContext, source: VideoSource?) : AutoCloseable, SharedObject(appContext) {
   // This improves the performance of playing DRM-protected content
   private var renderersFactory = DefaultRenderersFactory(context)
     .forceEnableMediaCodecAsynchronousQueueing()
-
+  val audioFocusManager = VideoPlayerAudioFocusManager(context, WeakReference(this))
   val player = ExoPlayer
     .Builder(context, renderersFactory)
     .setLooper(context.mainLooper)
@@ -43,26 +45,23 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
   var playing = false
     set(value) {
       if (field != value) {
-        sendEventOnJSThread("playingChange", value, field)
+        emit("playingChange", value, field)
       }
       field = value
     }
 
-  var status: PlayerStatus = IDLE
-
-  var currentMediaItem: MediaItem? = null
-    set(newMediaItem) {
-      if (field != newMediaItem) {
-        val oldVideoSource = VideoManager.getVideoSourceFromMediaItem(field)
-        val newVideoSource = VideoManager.getVideoSourceFromMediaItem(newMediaItem)
-
-        sendEventOnJSThread("sourceChange", newVideoSource, oldVideoSource)
+  var uncommittedSource: VideoSource? = source
+  private var lastLoadedSource: VideoSource? = null
+    set(value) {
+      if (field != value && value != null) {
+        emit("sourceChange", value, field)
       }
-      field = newMediaItem
+      field = value
     }
 
   // Volume of the player if there was no mute applied.
   var userVolume = 1f
+  var status: PlayerStatus = IDLE
   var requiresLinearPlayback = false
   var staysActiveInBackground = false
   var preservesPitch = false
@@ -70,6 +69,13 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
       playbackParameters = applyPitchCorrection(playbackParameters)
       field = preservesPitch
     }
+  var showNowPlayingNotification = true
+    set(value) {
+      field = value
+      playbackServiceBinder?.service?.setShowNotification(value, this.player)
+    }
+  var duration = 0f
+  var isLive = false
 
   private var serviceConnection: ServiceConnection
   internal var playbackServiceBinder: PlaybackServiceBinder? = null
@@ -79,22 +85,23 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
     set(volume) {
       if (player.volume == volume) return
       player.volume = if (muted) 0f else volume
-      sendEventOnJSThread("volumeChange", VolumeEvent(volume, muted), VolumeEvent(field, muted))
+      emit("volumeChange", VolumeEvent(volume, muted), VolumeEvent(field, muted))
       field = volume
     }
 
   var muted = false
     set(muted) {
       if (field == muted) return
-      sendEventOnJSThread("volumeChange", VolumeEvent(volume, muted), VolumeEvent(volume, field))
+      emit("volumeChange", VolumeEvent(volume, muted), VolumeEvent(volume, field))
       player.volume = if (muted) 0f else userVolume
       field = muted
+      audioFocusManager.onPlayerChangedAudioFocusProperty(this@VideoPlayer)
     }
 
   var playbackParameters: PlaybackParameters = PlaybackParameters.DEFAULT
     set(newPlaybackParameters) {
       if (playbackParameters.speed != newPlaybackParameters.speed) {
-        sendEventOnJSThread("playbackRateChange", newPlaybackParameters.speed, playbackParameters.speed)
+        emit("playbackRateChange", newPlaybackParameters.speed, playbackParameters.speed)
       }
       val pitchCorrectedPlaybackParameters = applyPitchCorrection(newPlaybackParameters)
       field = pitchCorrectedPlaybackParameters
@@ -107,6 +114,7 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
   private val playerListener = object : Player.Listener {
     override fun onIsPlayingChanged(isPlaying: Boolean) {
       this@VideoPlayer.playing = isPlaying
+      audioFocusManager.onPlayerChangedAudioFocusProperty(this@VideoPlayer)
     }
 
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
@@ -114,9 +122,10 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-      this@VideoPlayer.currentMediaItem = mediaItem
+      this@VideoPlayer.duration = 0f
+      this@VideoPlayer.isLive = false
       if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
-        sendEventOnJSThread("playToEnd")
+        emit("playToEnd")
       }
       super.onMediaItemTransition(mediaItem, reason)
     }
@@ -125,12 +134,17 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
       if (playbackState == Player.STATE_IDLE && player.playerError != null) {
         return
       }
+      if (playbackState == Player.STATE_READY) {
+        this@VideoPlayer.duration = this@VideoPlayer.player.duration / 1000f
+        this@VideoPlayer.isLive = this@VideoPlayer.player.isCurrentMediaItemLive
+      }
       setStatus(playerStateToPlayerStatus(playbackState), null)
       super.onPlaybackStateChanged(playbackState)
     }
 
     override fun onVolumeChanged(volume: Float) {
       this@VideoPlayer.volume = volume
+      audioFocusManager.onPlayerChangedAudioFocusProperty(this@VideoPlayer)
     }
 
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
@@ -141,6 +155,8 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
     override fun onPlayerErrorChanged(error: PlaybackException?) {
       error?.let {
         setStatus(ERROR, error)
+        this@VideoPlayer.duration = 0f
+        this@VideoPlayer.isLive = false
       } ?: run {
         setStatus(playerStateToPlayerStatus(player.playbackState), null)
       }
@@ -194,6 +210,7 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
   }
 
   override fun close() {
+    audioFocusManager.onPlayerDestroyed()
     appContext?.reactContext?.unbindService(serviceConnection)
     playbackServiceBinder?.service?.unregisterPlayer(player)
     VideoManager.unregisterVideoPlayer(this@VideoPlayer)
@@ -202,6 +219,8 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
       player.removeListener(playerListener)
       player.release()
     }
+    uncommittedSource = null
+    lastLoadedSource = null
   }
 
   override fun deallocate() {
@@ -216,8 +235,16 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
   }
 
   fun prepare() {
-    player.setMediaItem(mediaItem)
-    player.prepare()
+    uncommittedSource?.let { videoSource ->
+      val mediaSource = videoSource.toMediaSource(context)
+      player.setMediaSource(mediaSource)
+      player.prepare()
+      lastLoadedSource = videoSource
+      uncommittedSource = null
+    } ?: run {
+      player.clearMediaItems()
+      player.prepare()
+    }
   }
 
   private fun applyPitchCorrection(playbackParameters: PlaybackParameters): PlaybackParameters {
@@ -249,18 +276,12 @@ class VideoPlayer(context: Context, appContext: AppContext, private val mediaIte
     }
 
     if (playbackError == null && player.playbackState == Player.STATE_ENDED) {
-      sendEventOnJSThread("playToEnd")
+      emit("playToEnd")
     }
 
     if (this.status != status) {
-      sendEventOnJSThread("statusChange", status.value, this.status.value, playbackError)
+      emit("statusChange", status.value, this.status.value, playbackError)
     }
     this.status = status
-  }
-
-  private fun sendEventOnJSThread(eventName: String, vararg args: Any?) {
-    appContext?.executeOnJavaScriptThread {
-      sendEvent(eventName, *args)
-    }
   }
 }

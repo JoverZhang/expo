@@ -6,6 +6,20 @@
 
 ### 🎉 New features
 
+- Support `location.reload()` in native production builds. ([#29572](https://github.com/expo/expo/pull/29572) by [@EvanBacon](https://github.com/EvanBacon))
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## 3.2.1 — 2024-04-23
+
+_This version does not introduce any user-facing changes._
+
+## 3.2.0 — 2024-04-18
+
+### 🎉 New features
+
 - Mark React client components with "use client" directives. ([#27300](https://github.com/expo/expo/pull/27300) by [@EvanBacon](https://github.com/EvanBacon))
 
 ### 🐛 Bug fixes

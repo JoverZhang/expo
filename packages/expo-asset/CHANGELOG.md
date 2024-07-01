@@ -6,6 +6,70 @@
 
 ### 🎉 New features
 
+### 🐛 Bug fixes
+
+### 💡 Others
+
+- Remove unused `pathJoin` function. ([#29963](https://github.com/expo/expo/pull/29963) by [@EvanBacon](https://github.com/EvanBacon))
+
+## 10.0.10 - 2024-06-20
+
+### 🐛 Bug fixes
+
+- Fixed `PlatformUtils.ts` to have the correct export placeholders for react-native-web ([#29791](https://github.com/expo/expo/pull/29791) by [@Bram-dc](https://github.com/Bram-dc))
+
+## 10.0.9 - 2024-06-13
+
+### 💡 Others
+
+- Removed @react-native/assets-registry dependency. ([#29541](https://github.com/expo/expo/pull/29541) by [@kudo](https://github.com/kudo))
+
+## 10.0.8 - 2024-06-06
+
+_This version does not introduce any user-facing changes._
+
+## 10.0.7 - 2024-06-05
+
+### 💡 Others
+
+- Pin @react-native subpackage versions to 0.74.83. ([#29441](https://github.com/expo/expo/pull/29441) by [@kudo](https://github.com/kudo))
+
+## 10.0.6 — 2024-05-03
+
+### 🐛 Bug fixes
+
+- Fixed `downloadAsync()` does not support Android resources from release builds. ([#28604](https://github.com/expo/expo/pull/28604) by [@kudo](https://github.com/kudo))
+
+## 10.0.5 — 2024-05-02
+
+_This version does not introduce any user-facing changes._
+
+## 10.0.4 — 2024-05-01
+
+_This version does not introduce any user-facing changes._
+
+## 10.0.3 — 2024-04-24
+
+### 🐛 Bug fixes
+
+- Fix `TypeError: (0, _ExpoAsset.downloadAsync) is not a function` when loading assets using Expo Web. ([#28405](https://github.com/expo/expo/pull/28405) by [@jamiees2](https://github.com/jamiees2))
+
+### 💡 Others
+
+- Update mocks for SDK51. ([#28424](https://github.com/expo/expo/pull/28424) by [@aleqsio](https://github.com/aleqsio))
+
+## 10.0.2 — 2024-04-23
+
+_This version does not introduce any user-facing changes._
+
+## 10.0.1 — 2024-04-22
+
+_This version does not introduce any user-facing changes._
+
+## 10.0.0 — 2024-04-18
+
+### 🎉 New features
+
 - Added config plugin to allow assets to be linked at build time. ([#27052](https://github.com/expo/expo/pull/27052) by [@alanjhughes](https://github.com/alanjhughes))
 - Add Apple TV support to the new iOS native module. ([#27823](https://github.com/expo/expo/pull/27823) by [@douglowder](https://github.com/douglowder))
 

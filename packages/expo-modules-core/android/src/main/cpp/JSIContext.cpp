@@ -54,14 +54,19 @@ void JSIContext::registerNatives() {
 }
 
 JSIContext::JSIContext(jni::alias_ref<jhybridobject> jThis)
-  : javaPart_(jni::make_global(jThis)) {}
+  : javaPart_(jni::make_global(jThis)),
+    threadSafeJThis(std::make_shared<ThreadSafeJNIGlobalRef<JSIContext::javaobject>>(
+      jni::Environment::current()->NewGlobalRef(javaPart_.get())
+    )) {}
 
 JSIContext::~JSIContext() {
-  unbindJSIContext(runtimeHolder->get());
-  // The runtime would be deallocated automatically.
-  // However, we need to enforce the order of deallocations.
-  // The runtime has to be deallocated before the JNI part.
-  runtimeHolder.reset();
+  if (runtimeHolder) {
+    unbindJSIContext(runtimeHolder->get());
+    // The runtime would be deallocated automatically.
+    // However, we need to enforce the order of deallocations.
+    // The runtime has to be deallocated before the JNI part.
+    runtimeHolder.reset();
+  }
 }
 
 void JSIContext::installJSI(
@@ -137,13 +142,17 @@ void JSIContext::prepareRuntime() {
 
   EventEmitter::installClass(runtime);
 
+  auto threadSafeRef = std::make_shared<ThreadSafeJNIGlobalRef<JSIContext::javaobject>>(
+    jni::Environment::current()->NewGlobalRef(javaPart_.get())
+  );
+
   SharedObject::installBaseClass(
     runtime,
     // We can't predict the order of deallocation of the JSIContext and the SharedObject.
     // So we need to pass a new ref to retain the JSIContext to make sure it's not deallocated before the SharedObject.
-    [javaObject = javaPart_](const SharedObject::ObjectId objectId) {
-      jni::ThreadScope::WithClassLoader([objectId = objectId, javaObject = std::move(javaObject)] {
-        JSIContext::deleteSharedObject(javaObject, objectId);
+    [threadSafeRef = std::move(threadSafeRef)](const SharedObject::ObjectId objectId) {
+      threadSafeRef->use([objectId](jni::alias_ref<JSIContext::javaobject> globalRef) {
+        JSIContext::deleteSharedObject(globalRef, objectId);
       });
     }
   );
@@ -169,7 +178,8 @@ void JSIContext::prepareRuntime() {
 jni::local_ref<JavaScriptModuleObject::javaobject>
 JSIContext::callGetJavaScriptModuleObjectMethod(const std::string &moduleName) const {
   if (javaPart_ == nullptr) {
-    throw std::runtime_error("getJavaScriptModuleObject: JSIContext was prepared to be deallocated.");
+    throw std::runtime_error(
+      "getJavaScriptModuleObject: JSIContext was prepared to be deallocated.");
   }
 
   const static auto method = expo::JSIContext::javaClassLocal()
@@ -270,7 +280,7 @@ void JSIContext::registerSharedObject(
 }
 
 void JSIContext::deleteSharedObject(
-  jni::global_ref<JSIContext::javaobject> javaObject,
+  jni::alias_ref<JSIContext::javaobject> javaObject,
   int objectId
 ) {
   if (javaObject == nullptr) {
@@ -318,6 +328,7 @@ void JSIContext::prepareForDeallocation() {
   runtimeHolder.reset();
   jniDeallocator.reset();
   javaPart_.reset();
+  wasDeallocated_ = true;
 }
 
 void JSIContext::jniSetNativeStateForSharedObject(
@@ -328,9 +339,9 @@ void JSIContext::jniSetNativeStateForSharedObject(
     id,
     // We can't predict the order of deallocation of the JSIContext and the SharedObject.
     // So we need to pass a new ref to retain the JSIContext to make sure it's not deallocated before the SharedObject.
-    [javaObject = javaPart_](const SharedObject::ObjectId objectId) {
-      jni::ThreadScope::WithClassLoader([objectId = objectId, javaObject = std::move(javaObject)] {
-        JSIContext::deleteSharedObject(javaObject, objectId);
+    [threadSafeRef = threadSafeJThis](const SharedObject::ObjectId objectId) {
+      threadSafeRef->use([objectId](jni::alias_ref<JSIContext::javaobject> globalRef) {
+        JSIContext::deleteSharedObject(globalRef, objectId);
       });
     }
   );
@@ -339,6 +350,10 @@ void JSIContext::jniSetNativeStateForSharedObject(
     ->cthis()
     ->get()
     ->setNativeState(runtimeHolder->get(), std::move(nativeState));
+}
+
+bool JSIContext::wasDeallocated() const {
+  return wasDeallocated_;
 }
 
 thread_local std::unordered_map<uintptr_t, JSIContext *> jsiContexts;

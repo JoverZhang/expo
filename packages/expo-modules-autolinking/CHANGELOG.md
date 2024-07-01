@@ -6,6 +6,20 @@
 
 ### 🎉 New features
 
+- Added `react-native-config` command to support core autolinking for react-native. ([#29818](https://github.com/expo/expo/pull/29818) by [@kudo](https://github.com/kudo))
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## 1.11.1 — 2024-04-23
+
+_This version does not introduce any user-facing changes._
+
+## 1.11.0 — 2024-04-18
+
+### 🎉 New features
+
 - Expand Android auto-linking to support new expo-build-properties ([#26895](https://github.com/expo/expo/pull/26895) by [@bpeltonc](https://github.com/bpeltonc))
 
 ### 🐛 Bug fixes

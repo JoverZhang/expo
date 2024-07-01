@@ -29,6 +29,10 @@ class JavaCallback @DoNotStrip internal constructor(@DoNotStrip private val mHyb
     }
   }
 
+  operator fun invoke() = checkIfValid {
+    invokeNative()
+  }
+
   operator fun invoke(result: Int) = checkIfValid {
     invokeNative(result)
   }
@@ -49,6 +53,10 @@ class JavaCallback @DoNotStrip internal constructor(@DoNotStrip private val mHyb
     invokeNative(result)
   }
 
+  operator fun invoke(code: String, errorMessage: String) = checkIfValid {
+    invokeNative(code, errorMessage)
+  }
+
   private external fun invokeNative()
   private external fun invokeNative(result: Int)
   private external fun invokeNative(result: Boolean)
@@ -58,6 +66,7 @@ class JavaCallback @DoNotStrip internal constructor(@DoNotStrip private val mHyb
   private external fun invokeNative(result: WritableNativeArray)
   private external fun invokeNative(result: WritableNativeMap)
   private external fun invokeNative(result: SharedRef<*>)
+  private external fun invokeNative(code: String, errorMessage: String)
 
   private inline fun checkIfValid(body: () -> Unit) {
     try {

@@ -11,7 +11,7 @@ internal func queryCustomNativeFonts() -> [String] {
 
   // [1] Get font family names for each font file
   let fontFamilies: [[String]] = fontFilePaths.compactMap { fontFilePath in
-    guard let fontUrl = Bundle.main.url(forResource: fontFilePath, withExtension: nil) as? URL else {
+    guard let fontUrl = Bundle.main.url(forResource: fontFilePath, withExtension: nil) else {
       return []
     }
     guard let fontDescriptors = CTFontManagerCreateFontDescriptorsFromURL(fontUrl as CFURL) as? [CTFontDescriptor] else {
@@ -50,26 +50,49 @@ internal func registerFont(_ font: CGFont) throws {
   var error: Unmanaged<CFError>?
 
   if !CTFontManagerRegisterGraphicsFont(font, &error), let error = error?.takeRetainedValue() {
-    throw FontRegistrationFailedException(error)
+    let fontError = CTFontManagerError(rawValue: CFErrorGetCode(error))
+
+    switch fontError {
+    case .alreadyRegistered, .duplicatedName:
+      // Ignore the error if:
+      // - this exact font instance was already registered or
+      // - another instance already registered with the same name (assuming it's most likely the same font anyway)
+      return
+    default:
+      throw FontRegistrationFailedException(error)
+    }
   }
 }
 
 /**
  Unregisters the given font, so the app will no longer be able to render it.
+ Returns a boolean indicating if the font is successfully unregistered after this function completes.
  */
-internal func unregisterFont(_ font: CGFont) throws {
+internal func unregisterFont(_ font: CGFont) throws -> Bool {
   var error: Unmanaged<CFError>?
 
   if !CTFontManagerUnregisterGraphicsFont(font, &error), let error = error?.takeRetainedValue() {
-    throw FontRegistrationFailedException(error)
+    if let ctFontManagerError = CTFontManagerError(rawValue: CFErrorGetCode(error as CFError)) {
+      switch ctFontManagerError {
+      case .systemRequired, .inUse:
+        return false
+      case .notRegistered:
+        return true
+      default:
+        throw FontRegistrationFailedException(error)
+      }
+    }
   }
+  return true
 }
 
 /**
  Unregisters a font with the given name, so the app will no longer be able to render it.
+ Returns a boolean indicating if the font is successfully unregistered after this function completes.
  */
-internal func unregisterFont(named fontName: String) throws {
+internal func unregisterFont(named fontName: String) throws -> Bool {
   if let font = CGFont(fontName as CFString) {
-    try unregisterFont(font)
+    return try unregisterFont(font)
   }
+  return true
 }

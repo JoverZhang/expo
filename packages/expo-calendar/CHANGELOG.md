@@ -8,6 +8,41 @@
 
 ### 🐛 Bug fixes
 
+- Standardize `getEventsAsync` to return events sorted by start date ([#28353](https://github.com/expo/expo/pull/28353) by [@demfabris](https://github.com/demfabris))
+
+### 💡 Others
+
+## 13.0.5 — 2024-05-14
+
+### 🐛 Bug fixes
+
+- [iOS] Fix missing event info on update. ([#28825](https://github.com/expo/expo/pull/28825) by [@robertying](https://github.com/robertying))
+
+## 13.0.4 — 2024-05-09
+
+### 🐛 Bug fixes
+
+- On `iOS`, workaround a bug in iOS 15 where an invalid `EKCalendarType` is returned in the calendar object when siri suggestions are enabled. ([#28714](https://github.com/expo/expo/pull/28714) by [@alanjhughes](https://github.com/alanjhughes))
+
+## 13.0.3 — 2024-05-01
+
+_This version does not introduce any user-facing changes._
+
+## 13.0.2 — 2024-04-24
+
+### 💡 Others
+
+- Use enums instead of objects for enumerable types. ([#27777](https://github.com/expo/expo/pull/27777) by [@behenate](https://github.com/behenate))
+
+## 13.0.1 — 2024-04-23
+
+_This version does not introduce any user-facing changes._
+
+## 13.0.0 — 2024-04-18
+
+### 🐛 Bug fixes
+
+- [iOS] Don't check calendar permissions for saving reminders, and fix missing details when saving calendar events. ([#28265](https://github.com/expo/expo/pull/28265) by [@robertying](https://github.com/robertying))
 - Fix the problem that stringifyDateValues is not compatible with simple type arrays. ([#27147](https://github.com/expo/expo/pull/27147) by [@XHFkindergarten](https://github.com/XHFkindergarten))
 
 ### 💡 Others

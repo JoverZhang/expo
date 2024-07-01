@@ -47,11 +47,11 @@ private func maybeSwizzleUIFont() {
   if hasSwizzled {
     return
   }
-  let originalMethod = class_getClassMethod(UIFont.self, #selector(UIFont.fontNames(forFamilyName:)))
-  let newMethod = class_getClassMethod(UIFont.self, #selector(UIFont._expo_fontNames(forFamilyName:)))
+  let originalFontNamesMethod = class_getClassMethod(UIFont.self, #selector(UIFont.fontNames(forFamilyName:)))
+  let newFontNamesMethod = class_getClassMethod(UIFont.self, #selector(UIFont._expo_fontNames(forFamilyName:)))
 
-  if let originalMethod, let newMethod {
-    method_exchangeImplementations(originalMethod, newMethod)
+  if let originalFontNamesMethod, let newFontNamesMethod {
+    method_exchangeImplementations(originalFontNamesMethod, newFontNamesMethod)
   } else {
     log.error("expo-font is unable to swizzle `UIFont.fontNames(forFamilyName:)`")
   }

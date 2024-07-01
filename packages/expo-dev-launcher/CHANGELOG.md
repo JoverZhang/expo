@@ -4,9 +4,125 @@
 
 ### 🛠 Breaking changes
 
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- [Android] Fix `"launchMode": "launcher"` support. ([#30004](https://github.com/expo/expo/pull/30004) by [@EvanBacon](https://github.com/EvanBacon))
+
+### 💡 Others
+
+- Removed redundant usage of `EventEmitter` instance. ([#28946](https://github.com/expo/expo/pull/28946) by [@tsapeta](https://github.com/tsapeta))
+
+### 🐛 Bug fixes
+
+- [iOS] Prevent React Native Dev Menu from showing up on launcher screen. ([#28936](https://github.com/expo/expo/pull/28936) by [@gabrieldonadel](https://github.com/gabrieldonadel))
+
+## 4.0.20 - 2024-06-13
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.19 - 2024-06-12
+
+### 🎉 New features
+
+- [Android] Automatically detect dev servers running on localhost with adb reverse. ([#29625](https://github.com/expo/expo/pull/29625) by [@gabrieldonadel](https://github.com/gabrieldonadel))
+
+### 🐛 Bug fixes
+
+- Fixed empty screen after reloading on Android. ([#29400](https://github.com/expo/expo/pull/29400) by [@kudo](https://github.com/kudo))
+
+## 4.0.18 - 2024-06-10
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.17 - 2024-06-06
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.15 — 2024-05-15
+
+### 🐛 Bug fixes
+
+- [Android] Removes the unnecessary reload when opening the backgrounded app from the icon. ([#28893](https://github.com/expo/expo/pull/28893) by [@lukmccall](https://github.com/lukmccall))
+
+## 4.0.14 — 2024-05-09
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.13 — 2024-05-09
+
+### 🐛 Bug fixes
+
+- Fixed loading error when both `expo-dev-client` and `expo-updates` installed but no `runtimeVersion` configured. ([#28662](https://github.com/expo/expo/pull/28662) by [@kudo](https://github.com/kudo))
+- Fixed loading error from a https dev-server on Android. ([#28691](https://github.com/expo/expo/pull/28691) by [@kudo](https://github.com/kudo))
+- Fixed build errors with use_frameworks on iOS. ([#28702](https://github.com/expo/expo/pull/28702) by [@kudo](https://github.com/kudo))
+
+## 4.0.12 — 2024-05-08
+
+### 🐛 Bug fixes
+
+- [iOS] Fixed DevMenu getting unresponsive after reloading bundle. ([#28664](https://github.com/expo/expo/pull/28664) by [@gabrieldonadel](https://github.com/gabrieldonadel))
+
+## 4.0.11 — 2024-05-04
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.10 — 2024-05-03
+
+### 🐛 Bug fixes
+
+- [Android] Fixed `LogBox` isn't working on the new architecture. ([#28602](https://github.com/expo/expo/pull/28602) by [@lukmccall](https://github.com/lukmccall))
+
+## 4.0.9 — 2024-05-02
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.8 — 2024-05-01
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.7 — 2024-05-01
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.6 — 2024-04-25
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.5 — 2024-04-25
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.4 — 2024-04-24
+
+### 🐛 Bug fixes
+
+- Fixed "Missing transform.routerRoot option in Metro bundling request" error when loading the bundle. ([#28428](https://github.com/expo/expo/pull/28428) by [@kudo](https://github.com/kudo))
+
+## 4.0.3 — 2024-04-23
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.2 — 2024-04-22
+
+_This version does not introduce any user-facing changes._
+
+## 4.0.1 — 2024-04-19
+
+### 🎉 New features
+
+- Added bridgeless mode support on Android. ([#28162](https://github.com/expo/expo/pull/28162) by [@kudo](https://github.com/kudo))
+
+## 4.0.0 — 2024-04-18
+
+### 🛠 Breaking changes
+
 - Removed configurable `enableAutoSetup` support. ([#28031](https://github.com/expo/expo/pull/28031) by [@kudo](https://github.com/kudo))
 
 ### 🎉 New features
+
+- [iOS] Add Add bridgeless support for React-Native 0.74. ([#28174](https://github.com/expo/expo/pull/28174) by [@gabrieldonadel](https://github.com/gabrieldonadel))
 
 ### 🐛 Bug fixes
 

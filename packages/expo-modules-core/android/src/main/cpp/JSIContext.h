@@ -9,6 +9,7 @@
 #include "JavaReferencesCache.h"
 #include "JSReferencesCache.h"
 #include "JNIDeallocator.h"
+#include "ThreadSafeJNIGlobalRef.h"
 
 #include <fbjni/fbjni.h>
 #include <jsi/jsi.h>
@@ -123,7 +124,7 @@ public:
   );
 
   static void deleteSharedObject(
-    jni::global_ref<JSIContext::javaobject> javaObject,
+    jni::alias_ref<JSIContext::javaobject> javaObject,
     int objectId
   );
 
@@ -145,9 +146,23 @@ public:
 
   void prepareForDeallocation();
 
+  bool wasDeallocated() const;
+
 private:
   friend HybridBase;
+
+  /*
+   * We store two global references to the Java part of the JSIContext.
+   * However, one is wrapped in additional abstraction to make it thread-safe,
+   * which increase the access time. For most operations, we should use the bare reference.
+   * Only for operations that are executed on different threads that aren't attached to JVM,
+   * we should use the thread-safe reference.
+   */
   jni::global_ref<JSIContext::javaobject> javaPart_;
+  std::shared_ptr<ThreadSafeJNIGlobalRef<JSIContext::javaobject>> threadSafeJThis;
+
+  bool wasDeallocated_ = false;
+
 
   explicit JSIContext(jni::alias_ref<jhybridobject> jThis);
 

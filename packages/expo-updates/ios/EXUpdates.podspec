@@ -4,7 +4,7 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 
 use_dev_client = false
 begin
-  use_dev_client = !!`node --print "require('expo-dev-client/package.json').version"`
+  use_dev_client = `node --print "require('expo-dev-client/package.json').version" 2>/dev/null`.length > 0
 rescue
   use_dev_client = false
 end
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.dependency 'EXManifests'
   s.dependency 'EASClient'
   s.dependency 'ReachabilitySwift'
-  s.dependency 'sqlite3', '~> 3.42.0'
+  s.dependency 'sqlite3', '~> 3.45.3+1'
 
   unless defined?(install_modules_dependencies)
     # `install_modules_dependencies` is defined from react_native_pods.rb.
